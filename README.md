@@ -21,7 +21,7 @@ Before you zip it, set the folder and zip name to your real project group, for e
 | --- | --- | --- |
 | Chan Yan Shing | s1385703 | Express server, Mongoose models, session login, REST APIs |
 | XI Haoyang | 13410235 | Server configuration, README setup guide, and local regression testing |
-| _fill in_ | _fill in_ | EJS pages and CSS |
+| XIE Tengyue | 13270086 | EJS pages and CSS |
 | _fill in_ | _fill in_ | Search filters, seed data, and manual testing |
 | _fill in_ | _fill in_ | README, curl commands, and the 10-minute demo |
 | _fill in_ | _fill in_ | _fill in_ |
