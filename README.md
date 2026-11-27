@@ -4,8 +4,6 @@ A server-side lost-and-found desk for a campus. Staff sign in, log objects that 
 
 This project follows the COMP3810SEF group-project requirements: Express.js, Mongoose, login and logout, CRUD web pages for signed-in staff, and REST CRUD APIs.
 
-Before you zip it, set the folder and zip name to your real project group, for example `comp3810sef_group3`. The copy here uses `comp3810sef_g42` because the class note says COMP3810 G42. Change that if the Google Sheet uses a different number. Do not include `node_modules`.
-
 ---
 
 ## 1. Project info
@@ -19,14 +17,12 @@ Before you zip it, set the folder and zip name to your real project group, for e
 
 | Name | SID | Work role |
 | --- | --- | --- |
-| Chan Yan Shing | s1385703 | Express server, Mongoose models, session login, REST APIs |
+| Chan Yan Shing | s1385703 | System's Implementation and Validation: Express server, Mongoose models, System's foundation, Database, REST APIs and it demo |
 | XI Haoyang | 13410235 | Server configuration, README setup guide, and local regression testing |
 | He Junru | 13395307 | EJS pages and CSS |
 | XIE Tengyue | 13270086 | Personal Profile Module Development, EJS Page Design, and CSS Styling |
 | Chan Pak Hei | 14601418 | Student "Report found item" with staff check-in (approval), and the staff Analytics dashboard using MongoDB aggregation, and the 10-minute demo |
 | SONG Zhaohe  | 13407624 | Staff CSV export, filtered-download UI, and export regression tests |
-
-- **Workload division:** Replace the blank rows with the real members. Each person should be able to explain their part in the week-13 demo. A member with no real work is a free rider.
 
 ## 3. Project file intro
 
@@ -70,30 +66,11 @@ Before you zip it, set the folder and zip name to your real project group, for e
 
 Run the following from the folder that contains `package.json` (Node.js 18 or newer).
 
-```bash
-npm ci
-cp .env.example .env
-node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
-```
-
-In PowerShell, use `Copy-Item .env.example .env` for the copy step.
-
-Set `MONGODB_URI` in `.env` to your group's Atlas connection string, including the
-intended database name. Allow the demo computer's IP in Atlas Network Access.
-Set `SESSION_SECRET` to the generated value. Keep it private and stable across
-restarts. Replacing the previous signing key requires users to sign in again.
-If a previous ZIP or commit contained a real Atlas password, have the database
-owner rotate it and use the replacement in `.env`.
+'npm install'
 
 Run `npm start` and open `http://localhost:8099`. Expect a MongoDB connection
 message followed by the listening URL. The server exits with the missing variable
 names if required settings are blank or absent.
-
-For an isolated test, start a local MongoDB instance and explicitly set
-`MONGODB_URI=mongodb://127.0.0.1:27017/lostdesk_test` in your test configuration.
-On startup, the server adds missing demo accounts and seeds sample items if the
-item collection is empty. Run the login and CRUD steps below against the test
-database. The application uses the configured database for the entire run.
 
 ### Verify setup
 
@@ -107,10 +84,6 @@ database. The application uses the configured database for the entire run.
 - Use the REST examples below on the test database. Expect HTTP 201 for POST,
   HTTP 200 for GET, PUT and DELETE, and HTTP 404 when reading a deleted item.
   Use the code returned by POST for the update and delete requests.
-
-For the class demo, set `MONGODB_URI` to the team's Atlas database in the
-actual Ubuntu or cloud environment and rehearse the web and API flows there.
-Use disposable records for the create, update, and delete demonstrations.
 
 ### Use of Login / Logout pages
 
