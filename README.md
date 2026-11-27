@@ -21,7 +21,7 @@ The owner claims the item at the Student Union Activity Room (學生會活動室
 |Name|SID|Work role|
 |-|-|-|
 |Chan Yan Shing|s1385703|System implementation and validation: Express server, Mongoose models, the application foundation, the database, the REST APIs, and the API demo|
-|XI Haoyang|13410235|Server configuration, README setup guide, and local regression testing|
+|XI Haoyang|13410235|Student and staff UI redesign, photo uploads, category filters, check-in fixes, and server setup and testing.|
 |He Junru|13395307|EJS pages and CSS|
 |XIE Tengyue|13270086|Personal profile pages, EJS page design, and CSS|
 |Chan Pak Hei|14601418|Student "Report found item" with staff check-in, the staff Analytics page (MongoDB aggregation), and the 10-minute demo|
@@ -91,10 +91,9 @@ Database, first match wins:
 
 1. `MONGODB_URI` in the environment, if it is set
 2. `atlas.local.json` in the project folder, if that file exists
-3. the Atlas address built into `server.js`, so a normal `npm start` needs no extra setup
-4. if none of those can connect, an in-memory MongoDB for this run only. That copy is empty of the class data and disappears when the server stops.
+3. if neither is configured, local MongoDB first, then an in-memory demo instance if local MongoDB is unavailable. The in-memory data disappears when the server stops.
 
-Do not commit `atlas.local.json`. It is listed in `.gitignore`.
+Do not commit `atlas.local.json`. It is listed in `.gitignore`. Set `SESSION_SECRET` in the environment for a stable session-signing key. Without it, each server start generates a new key. Demo reset is available only from the local machine while using local MongoDB.
 
 ### Verify setup
 

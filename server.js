@@ -10,10 +10,11 @@
  * Database, first match wins:
  *   1. MONGODB_URI environment variable
  *   2. atlas.local.json in this folder
- *   3. the Atlas address built into readConfigUri()
+ *   3. local MongoDB, then an in-memory demo instance
  */
 
 const fs = require("fs");
+const { randomBytes } = require("node:crypto");
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
@@ -75,7 +76,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "lostdesk-course-demo-secret",
+    secret: process.env.SESSION_SECRET || randomBytes(32).toString("hex"),
     resave: false,
     saveUninitialized: false,
     cookie: { httpOnly: true, sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 },
@@ -176,8 +177,7 @@ function readConfigUri() {
       console.error("Could not read atlas.local.json");
     }
   }
-  // Built in so `npm install` then `npm start` opens this desk with no extra setup.
-  return "mongodb+srv://s1385703_db_user:s1385703@cluster0.mbydgpj.mongodb.net/lostdesk";
+  return null;
 }
 
 async function uniqueCode(category) {
@@ -456,6 +456,10 @@ app.post("/profile/password", requireLogin, async (req, res, next) => {
 });
 
 app.post("/reset", async (req, res, next) => {
+  const loopback = ["127.0.0.1", "::1", "::ffff:127.0.0.1", "localhost"];
+  if (!loopback.includes(mongoose.connection.host) || !loopback.includes(req.ip)) {
+    return res.sendStatus(404);
+  }
   try {
     await Promise.all([User.deleteMany({}), Item.deleteMany({})]);
     await User.insertMany(baseline.users);
@@ -631,7 +635,7 @@ app.get("/desk/:code/edit", requireStaff, async (req, res, next) => {
     if (!item) return res.redirect("/desk");
     const view = viewItem(item, false);
     return res.render("edit", {
-      title: `Edit ${view.name}`,
+      title: `${view.needsCheckIn ? "Check in" : "Edit"} ${view.name}`,
       mode: "edit",
       action: `/desk/${view.code}/update`,
       error: "",
@@ -647,15 +651,19 @@ app.post("/desk/:code/update", requireStaff, readCoverUpload, async (req, res, n
     const code = req.params.code.toUpperCase();
     const existing = await Item.findOne({ code });
     if (!existing) return res.redirect("/desk");
+    const view = viewItem(existing, false);
     const { data, errors } = parseItemInput(req.body, "create");
+    if (view.needsCheckIn && (!data.spot || data.spot.toLowerCase() === PENDING_SPOT.toLowerCase())) {
+      errors.unshift("Enter the actual shelf location to confirm check-in.");
+    }
     if (req.coverError) errors.unshift(req.coverError);
     if (errors.length) {
       return res.status(400).render("edit", {
-        title: `Edit ${existing.name}`,
+        title: `${view.needsCheckIn ? "Check in" : "Edit"} ${existing.name}`,
         mode: "edit",
         action: `/desk/${code}/update`,
         error: errors[0],
-        values: { ...viewItem(existing, false), ...req.body, code, hasCover: Boolean(existing.coverType) },
+        values: { ...view, ...req.body, code, hasCover: view.hasCover, needsCheckIn: view.needsCheckIn },
       });
     }
     const update = { $set: { ...data, ...req.cover } };
@@ -663,7 +671,9 @@ app.post("/desk/:code/update", requireStaff, readCoverUpload, async (req, res, n
       update.$unset = { coverBytes: 1, coverType: 1 };
     }
     await Item.updateOne({ code }, update);
-    setFlash(req, `${data.name} was updated.`);
+    setFlash(req, view.needsCheckIn && data.status === "stored"
+      ? `${data.name} was checked in and is now visible to students.`
+      : `${data.name} was updated.`);
     return res.redirect(`/desk/${code}`);
   } catch (err) {
     return next(err);

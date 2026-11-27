@@ -4,8 +4,8 @@
   <a class="back" href="<%= mode === 'create' ? '/desk' : '/desk/' + values.code %>">Back</a>
   <header class="page-head">
     <div>
-      <p class="eyebrow"><%= mode === "create" ? "Create" : "Update" %></p>
-      <h1><%= mode === "create" ? "Log a found item" : "Edit " + values.name %></h1>
+      <p class="eyebrow"><%= values.needsCheckIn ? "Student report" : mode === "create" ? "Create" : "Update" %></p>
+      <h1><%= mode === "create" ? "Log a found item" : (values.needsCheckIn ? "Check in " : "Edit ") + values.name %></h1>
     </div>
   </header>
   <% if (flash) { %><p class="banner" role="status"><%= flash %></p><% } %>

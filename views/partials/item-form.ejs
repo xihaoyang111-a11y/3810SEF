@@ -62,8 +62,15 @@
     </select>
   </div>
   <div class="field">
-    <label for="spot">Shelf spot <span class="hint">optional</span></label>
-    <input id="spot" name="spot" maxlength="80" value="<%= values.spot %>">
+    <label for="spot"><%= values.needsCheckIn ? "Actual shelf location" : "Shelf spot" %>
+      <% if (!values.needsCheckIn) { %><span class="hint">optional</span><% } %>
+    </label>
+    <input id="spot" name="spot" maxlength="80"
+      value="<%= values.needsCheckIn && String(values.spot).trim().toLowerCase() === 'pending inspection' ? '' : values.spot %>"
+      <% if (values.needsCheckIn) { %>required placeholder="e.g. Bin B3" aria-describedby="check-in-help"<% } %>>
+    <% if (values.needsCheckIn) { %>
+      <small id="check-in-help">Enter where the item is stored. Leave Status set to Stored to make it visible to students after check-in.</small>
+    <% } %>
   </div>
   <div class="field">
     <label for="description">Description <span class="hint">optional</span></label>
@@ -85,7 +92,7 @@
     <% } %>
   </aside>
   <div class="form-actions">
-    <button class="btn" type="submit"><%= mode === "create" ? "Save record" : "Update record" %></button>
+    <button class="btn" type="submit"><%= values.needsCheckIn ? "Confirm check-in" : mode === "create" ? "Save record" : "Update record" %></button>
     <a class="btn btn-ghost" href="<%= mode === "create" ? "/desk" : "/desk/" + values.code %>">Cancel</a>
   </div>
 </form>
