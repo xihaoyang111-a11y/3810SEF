@@ -1,0 +1,74 @@
+<%- include("partials/head") %>
+<%- include("partials/nav") %>
+<main class="wrap narrow">
+  <a class="back" href="/desk">Back</a>
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Found something?</p>
+      <h1>Report a found item</h1>
+    </div>
+  </header>
+  <p class="help report-intro">Tell the desk what you found. You get a reference number straight away. Then bring the item to <%= desk.place %> (<%= desk.placeZh %>), <%= desk.hours %>. It shows on the waiting list after staff have checked it in.</p>
+
+  <% if (error) { %>
+    <p class="banner banner-bad" role="alert"><%= error %></p>
+  <% } %>
+
+  <form class="sheet" method="post" action="/desk/report">
+    <div class="field">
+      <label for="name">What did you find?</label>
+      <input id="name" name="name" required maxlength="80" value="<%= values.name %>" placeholder="Blue water bottle, Sony headphones">
+    </div>
+
+    <div class="split">
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <% CATEGORIES.forEach(function (c) { %>
+            <option value="<%= c %>" <%= values.category === c ? "selected" : "" %>><%= categoryLabel(c) %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field">
+        <label for="campus">Campus</label>
+        <select id="campus" name="campus">
+          <% CAMPUSES.forEach(function (c) { %>
+            <option value="<%= c %>" <%= values.campus === c ? "selected" : "" %>><%= campusLabel(c) %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="field">
+        <label for="place">Found at</label>
+        <select id="place" name="place">
+          <% PLACES.forEach(function (p) { %>
+            <option value="<%= p %>" <%= values.place === p ? "selected" : "" %>><%= placeLabel(p) %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field">
+        <label for="foundOn">Date found</label>
+        <input id="foundOn" name="foundOn" type="date" required value="<%= values.foundOn %>">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="description">Details <span class="hint">optional</span></label>
+      <textarea id="description" name="description" maxlength="280" rows="3" placeholder="Stickers, scratches, what is inside"><%= values.description %></textarea>
+    </div>
+
+    <div class="field">
+      <label for="reporterContact">Your email or phone <span class="hint">optional</span></label>
+      <input id="reporterContact" name="reporterContact" maxlength="80" value="<%= values.reporterContact %>" placeholder="So staff can ask you about it">
+      <p class="help">Only desk staff can see this. Reported as <strong><%= user.username %></strong>.</p>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Send report</button>
+      <a class="btn btn-ghost" href="/desk">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include("partials/foot") %>

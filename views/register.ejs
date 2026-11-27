@@ -1,0 +1,30 @@
+<%- include("partials/head") %>
+<main class="auth">
+  <section class="auth-story">
+    <p class="eyebrow">Student account</p>
+    <h1>Check what is waiting at the desk.</h1>
+    <p>Use a student ID such as s1234567. The password needs at least one letter and at least three numbers.</p>
+  </section>
+  <section class="auth-panel">
+    <form class="sheet" method="post" action="/register">
+      <h2>Sign up</h2>
+      <% if (error) { %><p class="banner banner-bad" role="alert"><%= error %></p><% } %>
+      <div class="field">
+        <label for="username">Student ID</label>
+        <input id="username" name="username" required maxlength="8" autocapitalize="none" value="<%= values.username %>" placeholder="s1234567">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="new-password">
+        <p class="help">At least one letter and three numbers. Example: test123.</p>
+      </div>
+      <div class="field">
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" name="confirm" type="password" required autocomplete="new-password">
+      </div>
+      <button class="btn btn-block" type="submit">Create account</button>
+      <p class="signup-line">Already registered? <a href="/login">Sign in</a></p>
+    </form>
+  </section>
+</main>
+<%- include("partials/foot") %>

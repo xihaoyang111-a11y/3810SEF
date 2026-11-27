@@ -1,0 +1,139 @@
+<%- include("partials/head") %>
+<%- include("partials/nav") %>
+<main class="wrap desk-page">
+  <% if (student) { %>
+    <section id="collection" class="collection-info" aria-label="Where to collect an item">
+      <%- include("partials/contact") %>
+    </section>
+    <div class="browse-summary">
+      <p><strong><%= stats.stored %></strong> Waiting to be claimed</p>
+      <a class="btn" href="/desk/report">Report found item</a>
+    </div>
+  <% } else { %>
+    <header class="page-head">
+      <h1>Item management</h1>
+      <a class="btn" href="/desk/new">Log item</a>
+    </header>
+    <section class="stats" aria-label="Shelf summary">
+      <article class="summary-stored"><strong><%= stats.stored - stats.pending %></strong><span>Stored</span></article>
+      <article class="summary-claimed"><strong><%= stats.claimed %></strong><span>Claimed</span></article>
+      <article class="summary-pending"><strong><%= stats.pending %></strong><span>Needs check-in</span></article>
+    </section>
+  <% } %>
+
+  <% if (flash) { %><p class="banner" role="status"><%= flash %></p><% } %>
+
+  <form class="filters<%= student ? " filters-student" : "" %>" method="get" action="/desk">
+    <div class="field search-field">
+      <label for="q">Search by name or reference</label>
+      <input id="q" name="q" value="<%= search.q %>" placeholder="House keys, red fob, or K184206">
+    </div>
+    <% if (student) { %>
+      <input type="hidden" name="category" value="<%= search.category %>">
+    <% } else { %>
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">Any</option>
+        <% CATEGORIES.forEach(function (c) { %>
+          <option value="<%= c %>" <%= search.category === c ? "selected" : "" %>><%= categoryLabel(c) %></option>
+        <% }) %>
+      </select>
+    </div>
+    <% } %>
+    <div class="field">
+      <label for="place">Found at</label>
+      <select id="place" name="place">
+        <option value="">Any</option>
+        <% PLACES.forEach(function (p) { %>
+          <option value="<%= p %>" <%= search.place === p ? "selected" : "" %>><%= placeLabel(p) %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field">
+      <label for="campus">Campus</label>
+      <select id="campus" name="campus">
+        <option value="">Any</option>
+        <% CAMPUSES.forEach(function (c) { %>
+          <option value="<%= c %>" <%= search.campus === c ? "selected" : "" %>><%= campusLabel(c) %></option>
+        <% }) %>
+      </select>
+    </div>
+    <% if (!student) { %>
+      <div class="field">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="">Any</option>
+          <% STATUSES.forEach(function (s) { %>
+            <option value="<%= s %>" <%= search.status === s ? "selected" : "" %>><%= statusLabel(s) %></option>
+          <% }) %>
+        </select>
+      </div>
+    <% } %>
+    <div class="filter-actions">
+      <button class="btn" type="submit">Search</button>
+      <a class="btn btn-ghost" href="/desk">Clear</a>
+    </div>
+  </form>
+
+  <% if (student) { %>
+    <nav class="category-shortcuts" aria-label="Item categories">
+      <% ["", ...CATEGORIES].forEach((category) => {
+        const params = new URLSearchParams();
+        if (search.q) params.set("q", search.q);
+        if (search.place) params.set("place", search.place);
+        if (search.campus) params.set("campus", search.campus);
+        if (category) params.set("category", category);
+        const selected = search.category === category;
+      %>
+        <a class="category-link<%= selected ? ' selected' : '' %>" <%= selected ? 'aria-current="true"' : '' %>
+          href="/desk<%= params.size ? '?' + params.toString() : '' %>"><%= category ? categoryLabel(category) : "All items" %></a>
+      <% }); %>
+    </nav>
+  <% } %>
+
+  <p class="showing">Showing <%= showing %><%= student ? " waiting" : " of " + stats.total %></p>
+
+  <% if (!items.length) { %>
+    <p class="empty"><%= student ? "Nothing is waiting that matches this search." : "Nothing matches. Clear the search, or log something that was just handed in." %></p>
+  <% } %>
+
+  <% if (student) { %>
+    <section class="cards browse-cards" aria-label="Waiting items">
+      <% items.forEach((item) => { %>
+        <article class="browse-card">
+          <a class="cover-link" href="/desk/<%= item.code %>" aria-label="View <%= item.name %>">
+            <%- include("partials/cover", { item }) %>
+          </a>
+          <div class="browse-card-copy">
+            <h2><a href="/desk/<%= item.code %>"><%= item.name %></a></h2>
+            <p class="meta"><%= item.placeLabel %> · <%= item.campusLabel %></p>
+            <p class="when"><%= item.foundLabel %></p>
+          </div>
+        </article>
+      <% }); %>
+    </section>
+  <% } else if (items.length) { %>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Item management table">
+      <table class="desk-table">
+        <thead><tr><th scope="col">Photo</th><th scope="col">Reference</th><th scope="col">Item name</th><th scope="col">Campus</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+        <tbody>
+          <% items.forEach((item) => { %>
+            <tr>
+              <td class="item-thumb"><%- include("partials/cover", { item }) %></td>
+              <td><span class="code"><%= item.code %></span></td>
+              <th scope="row"><a href="/desk/<%= item.code %>"><%= item.name %></a></th>
+              <td><%= item.campusLabel %></td>
+              <td><span class="pill pill-<%= item.needsCheckIn ? "pending" : item.status %>"><%= item.needsCheckIn ? "Needs check-in" : item.statusLabel %></span></td>
+              <td><div class="row-actions">
+                <a href="/desk/<%= item.code %>">View</a>
+                <a href="/desk/<%= item.code %>/edit"><%= item.needsCheckIn ? "Check in" : "Edit" %></a>
+              </div></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</main>
+<%- include("partials/foot") %>

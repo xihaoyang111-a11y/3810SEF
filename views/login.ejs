@@ -1,0 +1,28 @@
+<%- include("partials/head") %>
+<main class="auth">
+  <section class="auth-story">
+    <p class="eyebrow">HKMU Lost Desk</p>
+    <h1>Lost something on campus?</h1>
+    <p>Sign in to see what is still waiting. Claim it at the Student Union Activity Room.</p>
+  </section>
+  <section class="auth-panel">
+    <form class="sheet" method="post" action="/login">
+      <h2>Sign in</h2>
+      <% if (restored) { %><p class="banner" role="status">Database restored to the saved data.</p><% } %>
+      <% if (flash) { %><p class="banner" role="status"><%= flash %></p><% } %>
+      <% if (error) { %><p class="banner banner-bad" role="alert"><%= error %></p><% } %>
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" required maxlength="20" placeholder="s1234567">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-block" type="submit">Sign in</button>
+      <p class="signup-line">New here? <a href="/register">Sign up</a></p>
+    </form>
+  </section>
+</main>
+<%- include("partials/reset") %>
+<%- include("partials/foot") %>

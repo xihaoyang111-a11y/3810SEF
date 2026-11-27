@@ -1,0 +1,14 @@
+<%- include("partials/head") %>
+<%- include("partials/nav") %>
+<main class="wrap desk-page">
+  <a class="back" href="<%= mode === 'create' ? '/desk' : '/desk/' + values.code %>">Back</a>
+  <header class="page-head">
+    <div>
+      <p class="eyebrow"><%= mode === "create" ? "Create" : "Update" %></p>
+      <h1><%= mode === "create" ? "Log a found item" : "Edit " + values.name %></h1>
+    </div>
+  </header>
+  <% if (flash) { %><p class="banner" role="status"><%= flash %></p><% } %>
+  <%- include("partials/item-form") %>
+</main>
+<%- include("partials/foot") %>

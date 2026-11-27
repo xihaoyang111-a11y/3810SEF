@@ -1,0 +1,5 @@
+<% if (item.hasCover) { %>
+  <img class="item-cover" src="/desk/<%= item.code %>/cover" alt="<%= item.name %>" loading="lazy">
+<% } else { %>
+  <span class="item-cover cover-placeholder"><%= item.categoryLabel %></span>
+<% } %>

@@ -1,0 +1,10 @@
+<%- include("partials/head") %>
+<% if (user) { %><%- include("partials/nav") %><% } %>
+<main class="wrap narrow">
+  <article class="sheet">
+    <h1><%= heading %></h1>
+    <p><%= detail %></p>
+    <a class="btn" href="<%= user ? '/desk' : '/login' %>"><%= !user ? "Sign in" : user.role === "student" ? "Back to waiting items" : "Back to the shelf" %></a>
+  </article>
+</main>
+<%- include("partials/foot") %>

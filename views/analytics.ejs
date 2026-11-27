@@ -1,0 +1,75 @@
+<%- include("partials/head") %>
+<%- include("partials/nav") %>
+<main class="wrap">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Computed by MongoDB aggregation</p>
+      <h1>Desk analytics</h1>
+    </div>
+    <a class="btn btn-ghost" href="/api/analytics" target="_blank" rel="noopener">View as JSON</a>
+  </header>
+
+  <section class="stats stats-four" aria-label="Key numbers">
+    <article>
+      <strong><%= stats.totalItems %></strong>
+      <span>Items recorded</span>
+    </article>
+    <article class="stat-claimed">
+      <strong><%= stats.claimRatePercent %>%</strong>
+      <span>Returned to owner</span>
+    </article>
+    <article>
+      <strong><%= stats.studentReports %></strong>
+      <span>Handed in by students</span>
+    </article>
+    <article>
+      <strong><%= stats.pendingInspection %></strong>
+      <span>Pending inspection</span>
+    </article>
+  </section>
+
+  <% if (!stats.totalItems) { %>
+    <p class="empty">No items are recorded yet, so there is nothing to count.</p>
+  <% } else { %>
+  <div class="panels">
+    <section class="sheet panel" aria-labelledby="hotspots-h">
+      <h2 id="hotspots-h">Top places things are found</h2>
+      <p class="help"><code>$group</code> by place → <code>$sort</code> → <code>$limit 5</code></p>
+      <ol class="bars">
+        <% stats.campusHotspots.forEach(function (row) { %>
+          <li>
+            <div class="bar-label"><span><%= row.label %></span><strong><%= row.count %></strong></div>
+            <div class="bar-track"><span class="bar-fill" style="width: <%= row.percent %>%"></span></div>
+          </li>
+        <% }) %>
+      </ol>
+    </section>
+
+    <section class="sheet panel" aria-labelledby="categories-h">
+      <h2 id="categories-h">By category</h2>
+      <p class="help"><code>$group</code> by category → <code>$sort</code></p>
+      <table class="data">
+        <thead><tr><th scope="col">Category</th><th scope="col" class="num">Items</th><th scope="col" class="num">Share</th></tr></thead>
+        <tbody>
+          <% stats.categoryBreakdown.forEach(function (row) { %>
+            <tr><td><%= row.label %></td><td class="num"><%= row.count %></td><td class="num"><%= row.percent %>%</td></tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="sheet panel" aria-labelledby="status-h">
+      <h2 id="status-h">Where items end up</h2>
+      <p class="help"><code>$group</code> by status. Return rate = claimed ÷ all items.</p>
+      <table class="data">
+        <tbody>
+          <% STATUSES.forEach(function (s) { %>
+            <tr><td><span class="pill pill-<%= s %>"><%= statusLabel(s) %></span></td><td class="num"><%= stats.statusSummary[s] %></td></tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+  </div>
+  <% } %>
+</main>
+<%- include("partials/foot") %>
