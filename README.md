@@ -1,229 +1,198 @@
 # Lost Desk
 
-A server-side lost-and-found desk for a campus. Staff sign in, log objects that were handed in, search the shelf when someone asks, mark a record claimed or cleared, and delete a mistaken entry. Each found object is one MongoDB document.
+A web-based lost-and-found application for a campus. Staff sign in, log items that were handed in, search the shelf, mark a record claimed or cleared, and delete a mistaken entry. Students sign in to see what is still waiting, and they can report something they found. Each found object is one MongoDB document.
 
-This project follows the COMP3810SEF group-project requirements: Express.js, Mongoose, login and logout, CRUD web pages for signed-in staff, and REST CRUD APIs.
+This project follows the COMP3810SEF group-project requirements: Express.js, Mongoose, login and logout, CRUD web pages for signed-in users, and REST CRUD APIs.
 
----
+\---
 
-## 1. Project info
+## 1\. Project info
 
-- **Project name:** Lost Desk
-- **What it is for:** The shelf behind a campus lost-property counter. Staff record what was found (name, category, place, date, shelf spot, and a short description), then move the record through three states: stored, claimed, or cleared. The point is to return property, not to demo a generic booking form.
+* **Project name:** Lost Desk
+* **What it is for:** 
 
-## 2. Group info
+## 2\. Group info
 
-- **Group intro:** COMP 3810SEF, project group G42.
+* **Group:** COMP 3810SEF, project group G42.
 
-| Name | SID | Work role |
-| --- | --- | --- |
-| Chan Yan Shing | s1385703 | System's Implementation and Validation: Express server, Mongoose models, System's foundation, Database, REST APIs and it demo |
-| XI Haoyang | 13410235 | Server configuration, README setup guide, and local regression testing |
-| He Junru | 13395307 | EJS pages and CSS |
-| XIE Tengyue | 13270086 | Personal Profile Module Development, EJS Page Design, and CSS Styling |
-| Chan Pak Hei | 14601418 | Student "Report found item" with staff check-in (approval), and the staff Analytics dashboard using MongoDB aggregation, and the 10-minute demo |
-| SONG Zhaohe  | 13407624 | Staff CSV export, filtered-download UI, and export regression tests |
+|Name|SID|Work role|
+|-|-|-|
+|Chan Yan Shing|s1385703|System implementation and validation: Express server, Mongoose models, the application foundation, the database, the REST APIs, and the API demo|
+|XI Haoyang|13410235|Server configuration, README setup guide, and local regression testing|
+|He Junru|13395307|EJS pages and CSS|
+|XIE Tengyue|13270086|Personal profile pages, EJS page design, and CSS|
+|Chan Pak Hei|14601418|Student "Report found item" with staff check-in, the staff Analytics page (MongoDB aggregation), and the 10-minute demo|
+|SONG Zhaohe|13407624|Staff CSV export, filtered-download UI, and export regression tests|
 
-## 3. Project file intro
+## 3\. Project file intro
 
-- **server.js:** Starts Express, connects to MongoDB, and seeds demo staff. Session login, logout, and registration. `requireLogin` blocks the desk pages. Web CRUD for lost items, plus status buttons (claimed / cleared / back to stored). REST API under `/api/items`. HTML forms use POST because a browser form cannot send PUT or DELETE. The API uses the real HTTP methods.
-- **package.json:** `express` (web framework), `ejs` (templates), `mongoose` (MongoDB), `express-session` (login cookie), `bcryptjs` (password hashes), `dotenv` (loads local environment variables). `npm start` runs `node server.js`.
-- **public:** `public/css/style.css` is the layout. `public/favicon.svg` is the tab icon.
-- **views:** EJS templates.
-  - `login.ejs`, `register.ejs` — sign in and register a student account
-  - `list.ejs` — the shelf, counts, and the search form (Read)
-  - `edit.ejs` plus `partials/item-form.ejs` — Create and Update
-  - `details.ejs` — one item, with Edit, status buttons, and Delete
-  - `message.ejs` — not found and errors
-  - `partials/nav.ejs` — shelf link and the Log out button
-- **models:**
-  - `User.js` — username, display name, bcrypt password hash
-  - `Item.js` — lost-property document and indexes
-  - `itemRules.js` — categories, places, statuses, validation, search filter
-  - `seed.js` — demo staff and sample items when the shelf is empty
-- **.env.example:** Configuration template. Copy it to `.env` and fill in the settings locally.
-- **models/itemExport.js:** CSV formatting for the staff export route, including spreadsheet formula protection.
-- **test/itemExport.test.js:** Automated CSV regression tests; run with `npm test` (no database required).
+* **server.js:** Starts Express on port 8099, connects to MongoDB, and seeds the desk when it is empty. Session login, logout, student registration, profile, and password change. `requireLogin`, `requireStaff`, and `requireStudent` protect the pages. Web CRUD for lost items, status buttons, student reports, cover photos, analytics, and **Reset database**. REST API under `/api/items`. HTML forms use POST because a browser form cannot send PUT or DELETE. The API uses the real HTTP methods.
+* **package.json:** `express`, `ejs`, `mongoose`, `express-session`, `bcryptjs`, `multer` (cover photos), and `mongodb-memory-server` (fallback only). `npm start` runs `node server.js`. Node.js 18 or newer.
+* **public:** `public/css/style.css` is the layout. `public/favicon.svg` is the tab icon. `public/icons/user.svg` is the profile icon. `public/js/cover-preview.js` previews a chosen photo.
+* **views:** EJS templates.
+
+  * `login.ejs`, `register.ejs` — one sign-in page, and student sign-up
+  * `list.ejs` — staff item table, or the student waiting cards, plus search
+  * `edit.ejs` and `partials/item-form.ejs` — staff Create and Update, including the cover photo
+  * `details.ejs` — one item, with Edit, status buttons, and Delete for staff
+  * `report.ejs` — a student reports an item they found
+  * `analytics.ejs` — staff counts from MongoDB aggregation
+  * `profile.ejs` — display name, email, phone, and password
+  * `message.ejs` — not found and errors
+  * `partials/nav.ejs` — Items or Browse items, Analytics for staff, My profile, Log out
+  * `partials/contact.ejs` — claim counter and phone
+  * `partials/reset.ejs` — **Reset database**, shown on the sign-in page only
+* **models:**
+
+  * `User.js` — username, display name, email, phone, role, bcrypt password hash
+  * `Item.js` — lost-property document, cover photo, and indexes
+  * `itemRules.js` — categories, campuses, places, statuses, validation, and the search filter
+  * `seed.js` — creates the demo staff and student accounts, and the 12 sample items, only when that data is missing
+  * `baseline.json` — the snapshot **Reset database** restores
+  * `coverUpload.js` — checks a JPEG, PNG, or WebP upload, 2 MB maximum
+  * `sampleCovers.js` and `sample-photos/` — the photos on the seeded items
+* **demo-curl\_updated.bat:** The six REST calls for the class demo. Run it in Command Prompt, not Bash. The first line should say `Script version: windows-cmd-11`.
+* **atlas.example.json:** Optional override template. The running application does not need this file.
 
 ### Item fields
 
-| Field | Meaning |
-| --- | --- |
-| code | Reference number. The first letter is the category, then six digits, such as `K184206` for keys. The desk assigns it. It is not typed in. |
-| name | What was found |
-| category | electronics, wallet, keys, clothing, books, bottle, idcard, other |
-| place | library, canteen, lecture, gym, gate, classroom, lounge, lab |
-| campus | MC (Main Campus), JCC (Jockey Club Campus), or IOH (Jockey Club Institute of Healthcare) |
-| status | stored, claimed, or disposed (shown as Cleared) |
-| foundOn | The day it was handed in |
-| spot | Shelf spot. Staff only. Students do not see it; they come to the counter and staff fetch the item after a short check. |
-| description | Marks, contents, how the owner proved it (optional) |
-| loggedBy | Staff or Student |
+|Field|Meaning|
+|-|-|
+|code|Reference number. The first letter is the category, then six digits, such as `K184206` for keys. The server assigns it. It is not typed in. Books and bottles both start with B.|
+|name|What was found|
+|category|electronics, wallet, keys, clothing, books, bottle, idcard, other|
+|place|library, canteen, lecture, gym, gate, classroom, lounge, lab|
+|campus|MC (Main Campus), JCC (Jockey Club Campus), or IOH (Jockey Club Institute of Healthcare)|
+|status|stored, claimed, or disposed (shown as Cleared)|
+|foundOn|The day it was found|
+|spot|Shelf spot. Staff only. A student report uses `Pending Inspection` until staff type the real spot. Students never see the spot.|
+|description|Marks, contents, or how the owner proved it. Optional.|
+|loggedBy|Staff or Student|
+|reportedBy|The student ID that sent a report. Staff-logged items say Staff.|
+|reporterContact|Optional email or phone from the report form. Staff only. The REST API does not return it.|
+|cover|Optional JPEG, PNG, or WebP, stored in MongoDB. An item without a photo shows its category name.|
 
-## 4. Operation guides
+## 4\. Operation guides
 
 ### Install and run
 
-Run the following from the folder that contains `package.json` (Node.js 18 or newer).
+From the folder that contains `package.json`:
 
-'npm install'
+```bash
+npm install
+npm start
+```
 
-Run `npm start` and open `http://localhost:8099`. Expect a MongoDB connection
-message followed by the listening URL. The server exits with the missing variable
-names if required settings are blank or absent.
+Open `http://localhost:8099`. The server listens on port 8099.
+
+Database, first match wins:
+
+1. `MONGODB\\\_URI` in the environment, if it is set
+2. `atlas.local.json` in the project folder, if that file exists
+3. the Atlas address built into `server.js`, so a normal `npm start` needs no extra setup
+4. if none of those can connect, an in-memory MongoDB for this run only. That copy is empty of the class data and disappears when the server stops.
+
+Do not commit `atlas.local.json`. It is listed in `.gitignore`.
 
 ### Verify setup
 
-- Run `node --check server.js`. A successful syntax check produces no output.
-- With neither required variable set in the shell or `.env`, `npm start` lists the
-  missing settings and exits with code 1.
-- With the test database configured, open `/desk` while signed out. It redirects
-  to `/login`. Sign in as staff to create and manage a test item. Sign in as a
-  student to verify that the desk shows only stored items and blocks `/desk/new`.
-  After signing out, `/desk` redirects to `/login` again.
-- Use the REST examples below on the test database. Expect HTTP 201 for POST,
-  HTTP 200 for GET, PUT and DELETE, and HTTP 404 when reading a deleted item.
-  Use the code returned by POST for the update and delete requests.
+* Run `node --check server.js`. A successful syntax check produces no output.
+* Open `/desk` while signed out. It redirects to `/login`.
+* Sign in as staff and create a test item. Sign in as a student and confirm `/desk/new` is refused.
+* After **Log out**, `/desk` redirects to `/login` again.
+* The REST examples below need no login. Expect HTTP 201 for POST, HTTP 200 for a found item, and HTTP 404 after that item is deleted.
 
-### Use of Login / Logout pages
+### Sign in, sign up, and log out
 
-The following seeded accounts are for the class demo and local testing.
+The sign-in page is one form. The server reads the account role and opens either the staff desk or the student waiting list. The page does not list the demo accounts.
 
-| Who | Username | Password | What they can do |
-| --- | --- | --- | --- |
-| Student | s1385703 | test123 | After sign-in, the waiting list only. No create, edit, or delete. |
-| Staff | admin | admin123 | Admin desk: log, search, update, claim, clear, delete. |
+|Who|Username|Password|What they can do|
+|-|-|-|-|
+|Staff|admin|admin123|Log, search, update, claim, clear, delete, analytics, and check-in|
+|Student|s1385703|test123|Waiting list, item details, and Report found item. No create, edit, or delete on the staff form.|
 
-The sign-in page is one form. The server reads the account role and opens either the admin desk or the student panel. There is no separate student login page, and the page does not list these accounts.
+**Reset database**, at the bottom of the sign-in page, restores the saved accounts and the 12 sample items, then signs everyone out. Press it before a demo if practice data is still in MongoDB. Do not press it during the demonstration.
 
-Student sign-up (link under the form):
+Student sign-up, from the link under the form:
 
-- Username must be a student ID: `s` plus 7 digits, such as `s1234567`.
-- Password must contain at least one English letter and at least three digits, such as `test123`.
-- Sign-up always creates a student. Staff accounts are only the seeded ones above.
+* Username must be a student ID: `s` plus 7 digits, such as `s2345678`.
+* Password needs at least one English letter and at least three digits, such as `test123`.
+* The two password boxes must match.
+* Sign-up always creates a student. It cannot create a staff account.
+* A bad student ID says `Student ID must look like s1234567.`
+* Different passwords say `The two passwords do not match.`
+* A used ID says `That student ID is already registered.`
+* A successful sign-up returns to Sign in with `Account created. Sign in to see what is waiting.`
 
-Sign-in steps:
+Sign-in failures are different on purpose:
 
-1. Open `http://localhost:8099/login`.
-2. Enter a username and password and press **Sign in**.
-3. A student sees items still waiting, the claim counter (Student Union Activity Room / 學生會活動室), and how to hand an item in or ask the desk to collect it.
-4. Staff see the full desk, including **Log item**.
-5. A student who opens Log item, Edit, or Delete is sent back to the waiting list.
-6. **Log out** is on every signed-in page (POST `/logout`).
+* Unknown username: `No account uses that username.`
+* Wrong password: `Password is not right.`
 
-### Use of the CRUD web pages
+**My profile** can change the display name, email, and phone, and can change the password. The username does not change.
 
-All of these need a login.
+**Log out** is on every signed-in page.
 
-| Action | Where | What to press |
-| --- | --- | --- |
-| Read / search | Shelf (`/desk`) | Four conditions: **name or note**, **category**, **found at**, and **status**. Press **Search**. **Clear** resets them. Counts are for the whole shelf. "Showing X of Y" is the filter result. Open a card for one item. |
-| Create | **Log item** | Fill in the form and press **Save record**. The desk assigns the reference number. There is no tag-code box. Required: name, category, campus, place, status, date found. |
-| Update | Item page → **Edit** | Change the fields and press **Update record**. Or use **Mark claimed**, **Clear from shelf**, or **Put back in storage** to change only the status. |
-| Delete | Item page → **Delete** | Confirm the dialog. The document is removed. |
-| Log out | Top bar → **Log out** | Ends the session. |
+### Staff desk
 
-Suggested click-through. Do not delete `K184206` (the house keys) if you still need the curl demo.
+|Action|Where|What to press|
+|-|-|-|
+|Read / search|Items (`/desk`)|Name or reference, category, found at, campus, and status. **Search** applies them. **Clear** resets them.|
+|Create|**Log item**|Name, category, campus, found at, status, date, logged by, optional shelf spot, description, and optional cover photo. **Save record**. There is no reference-number box.|
+|Update|**Edit** or **Check in**|Change the fields and press **Update record**. Or use **Mark claimed**, **Clear from shelf**, or **Put back in storage**.|
+|Delete|Item page → **Delete**|Confirm the dialog. Only that document is removed.|
+|Check in|A row marked **Needs check-in**|**Check in**, replace `Pending Inspection` with the real shelf spot, and save. Students can then see it.|
+|Analytics|**Analytics**|Counts are calculated in MongoDB with aggregation. **View as JSON** opens `/api/analytics`.|
 
-1. Sign in as admin.
-2. Search category **Electronics** and status **Stored**. AirPods case, calculator, and charger should remain.
-3. Search status **Claimed**. The hoodie, student card, and earring should remain.
-4. Log item: name `Black cap`, place Library, status Stored. Save.
-5. Open it, **Edit** the description, then **Mark claimed**.
-6. Delete that new item, not a seeded one.
-7. Log out and show that `/desk` returns you to sign-in.
+Do not delete `K184206` (House keys). The API demo still reads it.
 
-### Cover photos and staff pages
+Suggested click-through:
 
-Staff can optionally add one JPEG, PNG, or WebP photo (up to 2 MB) when
-logging or editing an item. Photos are stored with the item in MongoDB and
-appear on the student cards and the staff item table. An older item without a
-photo shows its category instead. Students can use category shortcuts and
-view photos only while the item is awaiting collection.
+1. Sign in as `admin` / `admin123`.
+2. Search category **Electronics** and status **Stored**. The AirPods case, USB-C charger, and Casio calculator remain.
+3. Open House keys. The reference starts with K. The shelf spot is visible.
+4. Log a new item named `Black cap`, category Clothing, campus MC, found at Library. Save, edit the description, then delete that new record.
+5. Log out.
 
-The staff sidebar links to **Items**, **Users**, and **Categories**. Items
-supports the existing search and editing workflow. Users lists accounts by
-name and role. Categories lists the current catalogue and item counts, with
-links to filter the list. Account and category definitions are read-only in
-these screens.
+### Student pages
 
-### Export search results to CSV (staff only)
+A student only sees items that are still stored and already checked in. Shelf spot, reporter contact, Edit, and Delete are hidden. The card says to claim the item at the Student Union Activity Room.
 
-Sign in as staff, set the search fields on **Items**, and press **Search**.
-Then press **Export CSV** to download the displayed results as
-`lost-desk-items.csv`. The export reuses all five search conditions (`q`,
-`category`, `place`, `campus`, `status`) and the same date/name sorting as the
-item list. With no filters, it exports all items. With no matches, the file
-contains column headings only.
+**Report found item** asks for the name, category, campus, place, date, optional details, and an optional email or phone. The server sets the status to stored, logged by Student, and the shelf spot to `Pending Inspection`. The item is not on the waiting list until staff check it in.
 
-The columns are reference, item name, category, found at, campus, status,
-date found, shelf spot, description, and logged by. Photos and account data
-are not included. UTF-8 with a BOM preserves Chinese text; commas, quotes,
-and line breaks are escaped as CSV. Text that could be treated as a spreadsheet
-formula receives a leading apostrophe.
+### Cover photos
 
-GET `/desk/export.csv` requires a staff session. Signed-out visitors are
-redirected to sign-in; students are redirected to their waiting list. Responses
-use `Cache-Control: private, no-store` because the file includes staff shelf
-locations. Export does not update or delete records.
+Staff can add one JPEG, PNG, or WebP photo, up to 2 MB, when logging or editing an item. The twelve sample items already have photos. A student sees a photo only while the item is waiting to be claimed.
 
-Run `npm test` for the CSV-formatting regression tests. For a demo, sign in
-as staff, search category **Electronics** and status **Stored**, and export.
-Confirm that the references in the file match the filtered list. Search for a
-nonexistent reference to demonstrate a headings-only export. Sign in as a
-student and confirm the button is absent and the direct URL redirects.
+### REST API
 
-### Use of the RESTful CRUD services
+No login is required. The commands assume port **8099**. The prepared file `demo-curl\\\_updated.bat` runs these six calls. Do not type them live.
 
-No login is required. The commands assume port **8099**. Paste them into column K of the presentation sheet before class. Do not type them live.
-
-| Action | HTTP | URI |
-| --- | --- | --- |
-| Read many / search | GET | `/api/items` |
-| Read one | GET | `/api/items/:code` |
-| Create | POST | `/api/items` |
-| Update | PUT | `/api/items/:code` |
-| Delete | DELETE | `/api/items/:code` |
-
-Search parameters, same meaning as the web form: `q`, `category`, `place`, `status` (`stored`, `claimed`, or `disposed`).
+Replace `Cxxxxxx` with the reference returned by the POST.
 
 ```bash
-# READ many
-curl -s http://localhost:8099/api/items
+# 1. READ one lost item: House keys
+curl -X GET http://localhost:8099/api/items/K184206
 
-# READ with two conditions: electronics still stored
-curl -s "http://localhost:8099/api/items?category=electronics&status=stored"
+# 2. READ search: stored electronics
+curl -X GET "http://localhost:8099/api/items?category=electronics\\\&status=stored"
 
-# READ one seeded item. K184206 is the house keys.
-curl -s http://localhost:8099/api/items/K184206
+# 3. CREATE a new lost item: Black cap. Do not send a reference number.
+curl -X POST -H "Content-Type: application/json" \\\\
+  --data '{"name":"Black cap","category":"clothing","place":"library","campus":"MC","status":"stored","foundOn":"2026-11-19","spot":"Bin B3","description":"No name inside"}' \\\\
+  http://localhost:8099/api/items
 
-# CREATE. Do not send a code. The server assigns a letter plus six digits.
-curl -s -X POST http://localhost:8099/api/items \
-  -H "Content-Type: application/json" \
-  -d "{\"name\":\"Black cap\",\"category\":\"clothing\",\"place\":\"library\",\"campus\":\"MC\",\"status\":\"stored\",\"foundOn\":\"2026-11-05\",\"spot\":\"Bin B3\",\"description\":\"No name inside\"}"
+# 4. UPDATE that Black cap
+curl -X PUT -H "Content-Type: application/json" \\\\
+  --data '{"status":"claimed","description":"Owner collected it at the desk"}' \\\\
+  http://localhost:8099/api/items/Cxxxxxx
 
-# Copy the "code" from that response, then UPDATE and DELETE it.
-# Clothing starts with C, so the code looks like C482910.
-curl -s -X PUT http://localhost:8099/api/items/C482910 \
-  -H "Content-Type: application/json" \
-  -d "{\"status\":\"claimed\",\"description\":\"Owner collected it at the desk\"}"
+# 5. DELETE that Black cap
+curl -X DELETE http://localhost:8099/api/items/Cxxxxxx
 
-curl -s -X DELETE http://localhost:8099/api/items/C482910
-
-# READ the deleted code. Replace C482910 with the code from POST. Expect HTTP 404.
-curl -i http://localhost:8099/api/items/C482910
-
-# Confirm the seeded item still exists. Expect HTTP 200.
-curl -s http://localhost:8099/api/items/K184206
+# 6. READ the deleted code (expect 404), then House keys (expect 200)
+curl -X GET http://localhost:8099/api/items/Cxxxxxx
+curl -X GET http://localhost:8099/api/items/K184206
 ```
 
-A bad body returns 400. An unknown code returns 404.
-
-### Submission checklist
-
-- Exclude `node_modules` from the submission ZIP.
-- Exclude `.env` and any legacy `atlas.local.json` from the submission ZIP. Include `.env.example`.
-- Zip name: `comp3810sef_groupNo.zip`, containing that same folder name.
-- Deadline: 23:59, 30 Nov 2026. Submit a day early if you can.
-- Register the presentation slot by 23:59, 16 Nov 2026.
-- Paste the curl block into column K before class.
+Search parameters are `q`, `category`, `place`, `campus`, and `status`. A bad body returns 400. An unknown code returns 404. `/api/analytics` returns the same aggregation numbers as the staff page, and it also needs no login.
