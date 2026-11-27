@@ -180,7 +180,7 @@ Replace `Cxxxxxx` with the reference returned by the POST.
 curl -X GET http://localhost:8099/api/items/K184206
 
 # 2. READ search: stored electronics
-curl -X GET "http://localhost:8099/api/items?category=electronics\\\&status=stored"
+curl -X GET "http://localhost:8099/api/items?category=electronics&status=stored"
 
 # 3. CREATE a new lost item: Black cap. Do not send a reference number.
 curl -X POST -H "Content-Type: application/json" --data "{\"name\":\"Black cap\",\"category\":\"clothing\",\"place\":\"library\",\"campus\":\"MC\",\"status\":\"stored\",\"foundOn\":\"2026-11-19\",\"spot\":\"Bin B3\",\"description\":\"No name inside\"}" http://localhost:8099/api/items
