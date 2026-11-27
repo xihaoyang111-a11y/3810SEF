@@ -183,14 +183,10 @@ curl -X GET http://localhost:8099/api/items/K184206
 curl -X GET "http://localhost:8099/api/items?category=electronics\\\&status=stored"
 
 # 3. CREATE a new lost item: Black cap. Do not send a reference number.
-curl -X POST -H "Content-Type: application/json" \\\\
-  --data '{"name":"Black cap","category":"clothing","place":"library","campus":"MC","status":"stored","foundOn":"2026-11-19","spot":"Bin B3","description":"No name inside"}' \\\\
-  http://localhost:8099/api/items
+curl -X POST -H "Content-Type: application/json" --data "{\"name\":\"Black cap\",\"category\":\"clothing\",\"place\":\"library\",\"campus\":\"MC\",\"status\":\"stored\",\"foundOn\":\"2026-11-19\",\"spot\":\"Bin B3\",\"description\":\"No name inside\"}" http://localhost:8099/api/items
 
 # 4. UPDATE that Black cap
-curl -X PUT -H "Content-Type: application/json" \\\\
-  --data '{"status":"claimed","description":"Owner collected it at the desk"}' \\\\
-  http://localhost:8099/api/items/Cxxxxxx
+curl -X PUT -H "Content-Type: application/json" --data "{\"status\":\"claimed\",\"description\":\"Owner collected it at the desk\"}" http://localhost:8099/api/items/Cxxxxxx
 
 # 5. DELETE that Black cap
 curl -X DELETE http://localhost:8099/api/items/Cxxxxxx
