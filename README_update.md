@@ -9,8 +9,7 @@ This project follows the COMP3810SEF group-project requirements: Express.js, Mon
 ## 1. Project info
 
 - **Project name:** Lost Desk
-- **What it is for:** The counter at the Student Union Activity Room (學生會活動室), G/F, Campus Centre. Open Monday to Friday, 10:00–18:00. Phone 5406 4218. Email hkmulostdesk@gmail.com.
-- Staff record what was found, then move the record through three states: stored, claimed, or cleared. A student report stays off the waiting list until staff check the item in and give it a real shelf spot.
+- **What it is for:**
 
 ## 2. Group info
 
