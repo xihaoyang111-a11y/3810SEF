@@ -1,7 +1,5 @@
 # Lost Desk
 
-A web-based lost-and-found application for a campus. Staff sign in, log items that were handed in, search the shelf, mark a record claimed or cleared, and delete a mistaken entry. Students sign in to see what is still waiting, and they can report something they found. Each found object is one MongoDB document.
-
 This project follows the COMP3810SEF group-project requirements: Express.js, Mongoose, login and logout, CRUD web pages for signed-in users, and REST CRUD APIs.
 
 \---
@@ -9,7 +7,12 @@ This project follows the COMP3810SEF group-project requirements: Express.js, Mon
 ## 1\. Project info
 
 * **Project name:** Lost Desk
-* **What it is for:** 
+* **What it is for:** Lost Desk is an online lost-and-found platform for the HKMU campus. We want to make it easier for students to find something they have lost, and to help someone else recover an item they have picked up. Items may be found at the Main Campus (MC), the Jockey Club Campus (JCC), or the Jockey Club Institute of Healthcare (IOH).
+
+A student signs in to see which items are still waiting to be claimed. A student who finds something can report it on the platform, then bring it to the desk or ask the desk to collect it.
+Desk staff sign in to log an item that was handed in, search the shelf, mark a record claimed or cleared, and remove a mistaken entry.
+
+The owner claims the item at the Student Union Activity Room (學生會活動室), G/F, Campus Centre. The counter is open Monday to Friday, 10:00–18:00. Staff make a short check, then return the item. The desk can be reached at 5406 4218 or hkmulostdesk@gmail.com.
 
 ## 2\. Group info
 
