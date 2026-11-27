@@ -1,0 +1,22 @@
+{
+  "name": "lostdesk",
+  "version": "1.0.0",
+  "description": "Lost Desk — campus lost-and-found tracker. COMP3810SEF group project.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.9.5",
+    "multer": "^2.5.0"
+  }
+}
