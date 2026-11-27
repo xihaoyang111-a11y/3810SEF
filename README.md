@@ -116,7 +116,7 @@ The sign-in page is one form. The server reads the account role and opens either
 |Student|s1234567|test123|Waiting list, item details, and Report found item. No create, edit, or delete on the staff form.|
 |Student|s2345678|test123|Waiting list, item details, and Report found item. No create, edit, or delete on the staff form.|
 
-**Reset database**, at the bottom of the sign-in page, restores the saved accounts and the 12 sample items, then signs everyone out. Press it before a demo if practice data is still in MongoDB. Do not press it during the demonstration.
+**Reset database**, at the bottom of the sign-in page, restores the current checkpoint: 4 accounts and 13 items, then signs everyone out. Press it before a demo if practice data is still in MongoDB. Do not press it during the demonstration.
 
 Student sign-up, from the link under the form:
 
