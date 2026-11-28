@@ -20,7 +20,7 @@ The owner claims the item at the Student Union Activity Room (學生會活動室
 
 |Name|SID|Work role|
 |-|-|-|
-|Chan Yan Shing|s1385703|System implementation and validation: Express server, Mongoose models, the application foundation, the database, the REST APIs, and the API demo|
+|Chan Yan Shing|13857033|System implementation and validation: Express server, Mongoose models, the application foundation, the database, the REST APIs, and the API demo|
 |XI Haoyang|13410235|Student and staff UI redesign, photo uploads, category filters, check-in fixes, and server setup and testing.|
 |He Junru|13395307|EJS pages and CSS|
 |XIE Tengyue|13270086|Personal profile pages, EJS page design, and CSS|
