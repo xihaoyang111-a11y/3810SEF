@@ -15,7 +15,7 @@
     <form class="logout" action="/logout" method="post">
       <a class="who profile-link" href="/profile" title="My Profile">
         <img src="/icons/user.svg" class="profile-icon" alt="">
-        My profile
+        <%= user.displayName || "My profile" %>
       </a>
 
       <button type="submit">Log out</button>
